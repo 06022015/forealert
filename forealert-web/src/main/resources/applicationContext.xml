@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:forealert.properties"/>
+    <context:annotation-config/>
+    <context:component-scan base-package="com.forealert.web"/>
+
+    <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:forealert.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <import resource="springCouchbase.xml"/>
+
+    <!--<bean id="dbClient"  class="org.lightcouch.CouchDbClient" destroy-method="shutdown"/>-->
+
+    <bean id="foreAlertBean" class="com.forealert.web.bean.ForeAlertBeanImpl">
+        <property name="messageRepository" ref="messageRepository"/>
+        <property name="properties" ref="properties"/>
+        <property name="userRepository" ref="userRepository"/>
+        <property name="groupRepository" ref="groupRepository"/>
+    </bean>
+
+    <bean id="messageRepository" class="com.forealert.repository.impl.MessageRepositoryImpl">
+    <constructor-arg ref="couchBaseTemplate"/>
+    </bean>
+
+    <bean id="userRepository" class="com.forealert.repository.impl.UserRepositoryImpl">
+        <constructor-arg ref="couchBaseTemplate"/>
+    </bean>
+
+    <bean id="groupRepository" class="com.forealert.repository.impl.GroupRepositoryImpl">
+        <constructor-arg ref="couchBaseTemplate"/>
+    </bean>
+
+    <bean id="messageBL" class="com.forealert.core.impl.MessageBLImpl">
+        <constructor-arg ref="foreAlertBean" />
+    </bean>
+
+    <bean id="userBL" class="com.forealert.core.impl.UserBLImpl">
+        <constructor-arg ref="foreAlertBean"/>
+    </bean>
+
+    <bean id="groupBL" class="com.forealert.core.impl.GroupBLImpl">
+        <constructor-arg ref="foreAlertBean"/>
+    </bean>
+
+     <bean id="coreConfig" class="com.forealert.core.util.CoreConfig">
+         <constructor-arg ref="foreAlertBean"/>
+     </bean>
+
+
+</beans>

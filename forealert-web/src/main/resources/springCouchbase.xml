@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:couchbase="http://www.springframework.org/schema/data/couchbase"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/data/couchbase
+                            http://www.springframework.org/schema/data/couchbase/spring-couchbase.xsd">
+
+    <couchbase:cluster id="couchbaseCluster" env-ref="couchbaseEnv">
+        <couchbase:node>localhost</couchbase:node>
+    </couchbase:cluster>
+
+    <couchbase:bucket id="bucket" bucketName="forealert" bucketPassword="forealert"  />
+    <!--<couchbase:repositories base-package="org.baeldung.spring.data.couchbase"/>-->
+
+
+    <bean id="couchbaseEnv" class="com.couchbase.client.java.env.DefaultCouchbaseEnvironment" factory-method="create"  />
+    <bean id="myCustomTranslationService" class="org.springframework.data.couchbase.core.convert.translation.JacksonTranslationService"/>
+
+    <!--<couchbase:repositories base-package="com.forealert.repository.couchbase" couchbase-template-ref="couchBaseTemplate"/>-->
+
+   <!-- <bean id="couchbaseClusterClient" class="com.couchbase.client.java.CouchbaseCluster" factory-method="create" >
+        <constructor-arg>
+            <list>
+                <value>127.0.0.1:8091</value>
+            </list>
+        </constructor-arg>
+    </bean>-->
+
+    <!--<bean id="couchbaseBucket" class="com.couchbase.client.java.Bucket"
+          factory-bean="couchbaseClusterClient" factory-method="openBucket" >
+        &lt;!&ndash; specify the bucket and password to use &ndash;&gt;
+        <constructor-arg index="0" type="java.lang.String" value="forealert"/>
+        <constructor-arg index="1" type="java.lang.String" value="forealert"/>
+    </bean>-->
+
+    <bean id="mappingContext"
+          class="org.springframework.data.couchbase.core.mapping.CouchbaseMappingContext">
+          </bean>
+    <bean id="converter"
+          class="com.forealert.web.util.CouchBaseConverter">
+        <constructor-arg name="mappingContext" ref="mappingContext"/>
+    </bean>
+
+    <couchbase:clusterInfo cluster-ref="couchbaseCluster" id="clusterInfo" login="Administrator" password="password"/>
+    <!--<couchbase:couchbase id="cache" host="${couchbase.host}" bucket="mycache" password="password"/>-->
+    <bean id="couchBaseTemplate" class="org.springframework.data.couchbase.core.CouchbaseTemplate" >
+        <constructor-arg index="0" ref="clusterInfo"/>
+        <constructor-arg index="1" ref="bucket"/>
+        <constructor-arg index="2" ref="converter" />
+        <constructor-arg name="translationService" ref="myCustomTranslationService"/>
+    </bean>
+</beans>
