@@ -21,6 +21,7 @@ public interface Constant {
     /*Error code*/
     static Integer DEFAULT_ERROR_CODE = 500;
     static Integer NO_RECORD_FOUND = 404;
+    static Integer CONFLICT = 409;
 
 
 

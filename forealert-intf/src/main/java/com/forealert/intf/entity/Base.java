@@ -3,11 +3,8 @@ package com.forealert.intf.entity;
 import com.couchbase.client.java.repository.annotation.Field;
 import com.couchbase.client.java.repository.annotation.Id;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.forealert.intf.Constant;
-import org.springframework.data.annotation.Version;
 
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,6 +24,7 @@ public abstract class Base {
     private Date updatedAt = new Date();
 
     @Field
+    @JsonIgnore
     private String typeKey = "Base";
 
     public String getId() {
@@ -57,6 +55,7 @@ public abstract class Base {
         this.updatedAt = updatedAt;
     }
 
+    @JsonIgnore
     public abstract String getTypeKey();
 
     public void setTypeKey(String typeKey) {

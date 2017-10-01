@@ -9,6 +9,6 @@ package com.forealert.intf.entity.type;
  */
 public enum UserMessageStatus {
 
-    SEND, DELIVERED, READ, DELETED
+    SEND, DELIVERED, READ, DELETED, FAILED
 
 }

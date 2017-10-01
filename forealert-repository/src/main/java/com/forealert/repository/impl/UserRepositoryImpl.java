@@ -12,6 +12,7 @@ import com.forealert.intf.entity.GroupEntity;
 import com.forealert.intf.entity.GroupMemberEntity;
 import com.forealert.intf.entity.UserEntity;
 import com.forealert.intf.entity.type.Role;
+import org.apache.ignite.springdata.repository.support.IgniteRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.couchbase.core.CouchbaseTemplate;
@@ -62,12 +63,7 @@ public class UserRepositoryImpl extends ForeAlterRepository implements UserRepos
         getCouchBaseTemplate().remove(user);
     }
 
-    private List<String> objectAsList(Object... objs){
-        List<String> results = new ArrayList<String>();
-        for(Object object : objs)
-            results.add(object.toString());
-        return results;
-    }
+
 
     @Override
     public List<UserEntity> findNearByUser(GeoPoint geoPoint, Role... roles) {
@@ -106,8 +102,17 @@ public class UserRepositoryImpl extends ForeAlterRepository implements UserRepos
                 .onKeys(Expression.i(GroupMemberEntity.TYPE+".userId"))
                 .join(Expression.i(Constant.BUCKET_NAME).as(GroupEntity.TYPE))
                 .onKeys(Expression.i(GroupMemberEntity.TYPE+".groupId"))
-                .where(Expression.i(GroupMemberEntity.TYPE + ".userId").eq(userId));
+                .where(Expression.i(GroupMemberEntity.TYPE + ".userId").eq(Expression.s(userId)));
         SimpleN1qlQuery query =  SimpleN1qlQuery.simple(statement.toString());
         return getCouchBaseTemplate().findByN1QL(query, GroupMemberEntity.class);
+    }
+    
+    public static void main(String args[]){
+        UserRepositoryImpl userRepository = new UserRepositoryImpl(null);
+        List<String> ids = new ArrayList<String>();
+        ids.add("FUser:0");
+        userRepository.findUserByIds(ids);
+        IgniteRepositoryImpl i = null;
+
     }
 }

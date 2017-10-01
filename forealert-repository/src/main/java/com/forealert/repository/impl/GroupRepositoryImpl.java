@@ -1,16 +1,18 @@
 package com.forealert.repository.impl;
 
-import com.couchbase.client.java.query.Select;
-import com.couchbase.client.java.query.SimpleN1qlQuery;
-import com.couchbase.client.java.query.Statement;
+import com.couchbase.client.java.document.json.JsonObject;
+import com.couchbase.client.java.query.*;
 import com.couchbase.client.java.query.dsl.Expression;
 import com.forealert.intf.Constant;
 import com.forealert.intf.api.repository.GroupRepository;
+import com.forealert.intf.dto.MessageDTO;
 import com.forealert.intf.entity.*;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.couchbase.core.CouchbaseTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,8 +36,9 @@ public class GroupRepositoryImpl extends ForeAlterRepository implements GroupRep
                 .from(Expression.i(Constant.BUCKET_NAME)
                         .as(Expression.i(GroupAttachmentEntity.TYPE)))
                 .join(Expression.i(Constant.BUCKET_NAME).as(GroupEntity.TYPE))
-                .onKeys(Expression.i(GroupAttachmentEntity.TYPE+".groupId"))
-                .where(Expression.i(GroupAttachmentEntity.TYPE + ".groupId").eq(groupId));
+                .onKeys(Expression.i(GroupAttachmentEntity.TYPE+"`.`groupId"))
+                .where(Expression.x("typeKey").eq(Expression.s(GroupAttachmentEntity.TYPE))
+                        .and(Expression.i(GroupAttachmentEntity.TYPE + "`.`groupId").eq(Expression.s(groupId))));
         SimpleN1qlQuery query =  SimpleN1qlQuery.simple(statement.toString());
         return getCouchBaseTemplate().findByN1QL(query, GroupAttachmentEntity.class);
     }
@@ -59,21 +62,52 @@ public class GroupRepositoryImpl extends ForeAlterRepository implements GroupRep
                 .from(Expression.i(Constant.BUCKET_NAME)
                         .as(Expression.i(EmojiEntity.TYPE)))
                 .join(Expression.i(Constant.BUCKET_NAME).as(GroupEntity.TYPE))
-                .onKeys(Expression.i(EmojiEntity.TYPE+".groupId"))
-                .where(Expression.i(EmojiEntity.TYPE + ".groupId").eq(groupId));
+                .onKeys(Expression.i(EmojiEntity.TYPE+"`.`groupId"))
+                .where(Expression.x("typeKey").eq(Expression.s(EmojiEntity.TYPE))
+                        .and(Expression.i(EmojiEntity.TYPE + "`.`groupId").eq(Expression.s(groupId))));
         SimpleN1qlQuery query =  SimpleN1qlQuery.simple(statement.toString());
         return getCouchBaseTemplate().findByN1QL(query, EmojiEntity.class);
     }
 
     @Override
     public GroupMemberEntity getGroupMember(String groupId, String userId) {
-        Statement statement = Select.select(GroupMemberEntity.TYPE + ".*, META("+GroupMemberEntity.TYPE+").id as _ID, META("+GroupMemberEntity.TYPE+").cas as _CAS")
+        Statement statement = Select.select(GroupMemberEntity.TYPE + ", META("+GroupMemberEntity.TYPE+").id as _ID, META("+GroupMemberEntity.TYPE+").cas as _CAS")
                 .from(Expression.i(Constant.BUCKET_NAME)
                         .as(Expression.i(GroupMemberEntity.TYPE)))
-                .where(Expression.i(GroupMemberEntity.TYPE + ".groupId").eq(groupId)
-                .and(Expression.i(GroupMemberEntity.TYPE+".userId").eq(userId)));
+                .where(Expression.x("typeKey").eq(Expression.s(GroupMemberEntity.TYPE))
+                        .and(Expression.i(GroupMemberEntity.TYPE + "`.`groupId").eq(Expression.s(groupId)))
+                .and(Expression.i(GroupMemberEntity.TYPE+"`.`userId").eq(Expression.s(userId))));
         SimpleN1qlQuery query =  SimpleN1qlQuery.simple(statement.toString());
         List groupMembers = getCouchBaseTemplate().findByN1QL(query, GroupMemberEntity.class);
         return null != groupMembers && groupMembers.size()>0? (GroupMemberEntity)groupMembers.get(0):null;
+    }
+
+    public List<GroupMemberEntity> getGroupMemberDetail(String groupId) {
+        Statement statement = Select.select(GroupMemberEntity.TYPE + ", "+UserEntity.TYPE+",  META("+GroupMemberEntity.TYPE+").id as _ID, META("+GroupMemberEntity.TYPE+").cas as _CAS")
+                .from(Expression.i(Constant.BUCKET_NAME)
+                        .as(Expression.i(GroupMemberEntity.TYPE)))
+                .join(Expression.i(Constant.BUCKET_NAME).as(UserEntity.TYPE))
+                .onKeys(Expression.i(UserMessageEntity.TYPE+"`.`userId"))
+                .where(Expression.x("typeKey").eq(Expression.s(GroupMemberEntity.TYPE))
+                        .and(Expression.i(GroupMemberEntity.TYPE + "`.`groupId").eq(Expression.s(groupId))));
+        SimpleN1qlQuery query =  SimpleN1qlQuery.simple(statement.toString());
+        N1qlQueryResult queryResult = getCouchBaseTemplate().queryN1QL(query);
+        List<GroupMemberEntity> groupMembers = new ArrayList<GroupMemberEntity>();
+        if (queryResult.finalSuccess()) {
+            List<N1qlQueryRow> allRows = queryResult.allRows();
+            Gson gson = new Gson();
+            for (N1qlQueryRow row : allRows) {
+                JsonObject json = row.value();
+                String id = json.getString(getCouchBaseTemplate().SELECT_ID);
+                JsonObject gm = json.getObject(GroupMemberEntity.TYPE);
+                GroupMemberEntity groupMember = gson.fromJson(gm.toString(), GroupMemberEntity.class);
+                groupMember.setId(id);
+                UserEntity user = gson.fromJson(json.getObject(UserEntity.TYPE).toString(),UserEntity.class);
+                user.setId(groupMember.getUserId());
+                groupMember.setUser(user);
+                groupMembers.add(groupMember);
+            }
+        }
+        return groupMembers;
     }
 }

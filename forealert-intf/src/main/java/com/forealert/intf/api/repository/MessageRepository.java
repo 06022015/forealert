@@ -1,7 +1,9 @@
 package com.forealert.intf.api.repository;
 
+import com.forealert.intf.dto.MessageDTO;
 import com.forealert.intf.entity.MessageEntity;
 import com.forealert.intf.entity.UserMessageEntity;
+import com.forealert.intf.entity.type.MessageStatus;
 
 import java.util.List;
 
@@ -17,5 +19,11 @@ public interface MessageRepository extends FARepository{
     MessageEntity getById(String id);
 
     void saveAll(List<UserMessageEntity> userMessages);
+
+    MessageDTO getMessageRecipient(String messageId);
+
+    MessageDTO getMessageRecipient(String messageId, String groupId);
+
+    List<MessageDTO> getUserMessage(String userId, long startTimeInMillis, MessageStatus... statuses);
 
 }

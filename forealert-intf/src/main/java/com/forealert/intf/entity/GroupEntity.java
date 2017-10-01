@@ -5,8 +5,8 @@ import org.springframework.data.couchbase.core.mapping.Document;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.nio.ByteBuffer;
-import java.util.Date;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,11 +30,9 @@ public class GroupEntity extends Base{
     @Field
     private String nameUpdatedBy;
     @Field
-    private ByteBuffer attachment;
-    @Field
-    private String attachedBy;
-    @Field
     private String parentGroupId;
+
+    private List<GroupMemberEntity> member;
 
     public GroupEntity() {
         setTypeKey(TYPE);
@@ -72,22 +70,6 @@ public class GroupEntity extends Base{
         this.nameUpdatedBy = nameUpdatedBy;
     }
 
-    public ByteBuffer getAttachment() {
-        return attachment;
-    }
-
-    public void setAttachment(ByteBuffer attachment) {
-        this.attachment = attachment;
-    }
-
-    public String getAttachedBy() {
-        return attachedBy;
-    }
-
-    public void setAttachedBy(String attachedBy) {
-        this.attachedBy = attachedBy;
-    }
-
     public String getParentGroupId() {
         return parentGroupId;
     }
@@ -96,7 +78,21 @@ public class GroupEntity extends Base{
         this.parentGroupId = parentGroupId;
     }
 
-    @Override
+
+    public List<GroupMemberEntity> getMember() {
+        return member;
+    }
+
+    public void setMember(List<GroupMemberEntity> member) {
+        this.member = member;
+    }
+
+    public void addMember(GroupMemberEntity groupMember){
+        if(null == getMember())
+            setMember(new ArrayList<GroupMemberEntity>());
+        getMember().add(groupMember);
+    }
+
     public String getTypeKey() {
         return TYPE;
     }

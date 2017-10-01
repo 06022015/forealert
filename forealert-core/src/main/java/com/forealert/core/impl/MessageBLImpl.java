@@ -15,6 +15,7 @@ import com.forealert.intf.api.repository.MessageRepository;
 import com.forealert.intf.api.repository.UserRepository;
 import com.forealert.intf.bean.ForeAlertBean;
 import com.forealert.intf.dto.FileDTO;
+import com.forealert.intf.dto.MessageDTO;
 import com.forealert.intf.entity.*;
 import com.forealert.intf.entity.type.*;
 import com.forealert.intf.exception.ForeAlertException;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -57,7 +59,7 @@ public class MessageBLImpl implements MessageBL {
         List<UserEntity> nearByUsers;
         do {
             GeoPoint geoPoint = new GeoPoint(message.getMessageLocation());
-            nearByUsers = userRepository.findNearByUser(geoPoint, Role.ADMIN_3);
+            nearByUsers = userRepository.findNearByUser(geoPoint, Role.ADMIN_3, Role.USER);
             radius += 5;
         } while (nearByUsers.size() <= 5 && radius <= 25);
         /*if(null == nearByUsers || nearByUsers.size()<=0)
@@ -274,8 +276,27 @@ public class MessageBLImpl implements MessageBL {
 
     }
 
+    public List<MessageDTO> getUserMessage(String userUUID) {
+        UserEntity user = userRepository.findUserByUUId(userUUID);
+        if(null == user)
+            throw new NoRecordFoundException("No user found for uuid:- "+ userUUID);
+        /*if(user.hasRole(Role.ADMIN_3, Role.ADMIN_4)){
+
+        }else{
+
+        }*/
+        return messageRepository.getUserMessage(user.getId(), getTimeBefore(30), MessageStatus.A);
+    }
+
     private void sendNotification(PushMessage pushMessage) {
         //TODO: send notification
         this.pnTaskExecutor.submit(new SendNotificationTask(pushMessage));
+    }
+
+
+    private Long getTimeBefore(int days){
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -days);
+        return cal.getTimeInMillis();
     }
 }

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * Time: 1:10 PM
  * To change this template use File | Settings | File Templates.
  */
-@Provider
+/*@Provider*/
 public class FAMetricRegistry extends ResourceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(FAMetricRegistry.class);

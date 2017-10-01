@@ -10,19 +10,20 @@ package com.forealert.intf.util;
 public class StringUtil {
     
     public static boolean isBlank(String text){
-        return null == text || "".equals(text);
+        return "".equals(text);
+
     }
 
     public static boolean isNotBlank(String text){
-        return null != text && !"".equals(text);
+        return !isBlank(text);
     }
 
     public static boolean isEmpty(String text){
-        return "".equals(text);
+        return null == text || "".equals(text);
     }
 
     public static boolean isNotEmpty(String text){
-        return !"".equals(text);
+        return !isEmpty(text);
     }
     
 }

@@ -25,8 +25,6 @@ public class GroupAttachmentEntity extends Base{
     @Field
     private FileType fileType;
     @Field
-    private ByteBuffer content;
-    @Field
     private String title;
     @Field
     private String description;
@@ -51,14 +49,6 @@ public class GroupAttachmentEntity extends Base{
 
     public void setFileType(FileType fileType) {
         this.fileType = fileType;
-    }
-
-    public ByteBuffer getContent() {
-        return content;
-    }
-
-    public void setContent(ByteBuffer content) {
-        this.content = content;
     }
 
     public String getTitle() {

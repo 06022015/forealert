@@ -1,6 +1,7 @@
 package com.forealert.intf.api.core;
 
 import com.forealert.intf.dto.FileDTO;
+import com.forealert.intf.dto.MessageDTO;
 import com.forealert.intf.entity.MessageEntity;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public interface MessageBL {
     MessageEntity getMessage(String id);
 
     void deleteMessage(String id);
+
+    List<MessageDTO> getUserMessage(String  userUUID);
 
 }

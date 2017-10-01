@@ -39,7 +39,7 @@ public class ForeAlertContextListener implements ServletContextListener {
         bucket.close();
         environment.shutdownAsync().toBlocking().single();
         environment.shutdown();
-        couchbaseCluster.disconnect();
+        //couchbaseCluster.disconnect();
         ForeAlertS3Client.INSTANCE.disconnect();
         NotificationFactory.INSTANCE.disconnect();
     }

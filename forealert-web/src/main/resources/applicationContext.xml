@@ -21,6 +21,12 @@
 
     <import resource="springCouchbase.xml"/>
 
+   <!-- <bean id="metricsListener" class="com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener">
+        <constructor-arg ref="metricsRegistry" />
+    </bean>
+
+    <bean id="metricsRegistry" class="com.codahale.metrics.MetricRegistry"/>-->
+
     <!--<bean id="dbClient"  class="org.lightcouch.CouchDbClient" destroy-method="shutdown"/>-->
 
     <bean id="foreAlertBean" class="com.forealert.web.bean.ForeAlertBeanImpl">

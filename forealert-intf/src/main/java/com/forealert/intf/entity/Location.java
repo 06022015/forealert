@@ -1,8 +1,6 @@
 package com.forealert.intf.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import com.couchbase.client.java.repository.annotation.Id;
-import org.springframework.data.couchbase.core.mapping.Document;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -76,5 +74,17 @@ public class Location {
 
     public void setWarningRadius(Double warningRadius) {
         this.warningRadius = warningRadius;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "city='" + city + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", altitude=" + altitude +
+                ", radius=" + radius +
+                ", warningRadius=" + warningRadius +
+                '}';
     }
 }

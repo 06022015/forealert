@@ -1,9 +1,12 @@
 package com.forealert.web.service;
 
+import com.codahale.metrics.annotation.Timed;
 import com.forealert.intf.api.core.MessageBL;
 import com.forealert.intf.dto.FileDTO;
 import com.forealert.intf.dto.ForeAlertStatus;
+import com.forealert.intf.dto.MessageDTO;
 import com.forealert.intf.entity.MessageEntity;
+import com.forealert.intf.entity.UserMessageEntity;
 import com.forealert.intf.util.StringUtil;
 import com.forealert.web.util.ValidatorUtil;
 import com.google.gson.Gson;
@@ -43,11 +46,19 @@ public class MessageService {
     @Autowired
     private MessageBL messageBL;
 
+
+    @GET
+    @Timed
+    public Response getMessage(@QueryParam("userUUId") String userUUId, @QueryParam("full")Boolean full){
+        List<MessageDTO> messageDTOs = messageBL.getUserMessage(userUUId);
+        return Response.ok().entity(messageDTOs).build();
+    }
+
     @GET
     @Path("/{messageId}")
     public Response get(@PathParam("messageId")String id) {
         MessageEntity message = messageBL.getMessage(id);
-        return Response.ok(message).build();
+        return Response.ok().entity(message).build();
     }
 
     @POST
@@ -72,7 +83,7 @@ public class MessageService {
             }
         }
         messageBL.reportIssue(message, files);
-        return Response.ok().entity(message.getId()).build();
+        return Response.ok().entity(message).build();
     }
 
     @POST
@@ -111,6 +122,12 @@ public class MessageService {
     @Path("/{messageId}")
     public Response delete(@PathParam("messageId")Long id) {
         return Response.ok().entity("Delete").build();
+    }
+
+    @PUT
+    @Path("/status")
+    public Response updateStatus(UserMessageEntity[] userMessage){
+       return null;
     }
 
 }

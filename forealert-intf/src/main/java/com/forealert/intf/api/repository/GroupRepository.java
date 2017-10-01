@@ -27,5 +27,7 @@ public interface GroupRepository extends FARepository{
     
     GroupMemberEntity getGroupMember(String groupId, String userId);
 
+    List<GroupMemberEntity> getGroupMemberDetail(String groupId);
+
 
 }

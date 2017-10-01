@@ -9,6 +9,7 @@ import com.forealert.intf.dto.FileDTO;
 import com.forealert.intf.dto.UserPermissionDTO;
 import com.forealert.intf.entity.*;
 import com.forealert.intf.entity.type.PrivilegeType;
+import com.forealert.intf.exception.DuplicateObjectException;
 import com.forealert.intf.exception.NoRecordFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,14 +88,17 @@ public class GroupBLImpl implements GroupBL {
     }
 
     @Override
-    public void addGroupMember(String groupId, String userUUId, UserPermissionDTO userPermissionDTO) {
+    public void addGroupMember(String groupId, String userId, UserPermissionDTO userPermissionDTO) {
         GroupEntity group = groupRepository.getById(groupId);
         if(null == group)
             throw new NoRecordFoundException("No user found for group id:- "+ groupId);
-        UserEntity user = userRepository.findUserByUUId(userUUId);
+        UserEntity user = userRepository.getUserById(userId);
         if(null == user)
-            throw new NoRecordFoundException("No user found for user UUID:- "+ userUUId);
-        GroupMemberEntity groupMember = new GroupMemberEntity();
+            throw new NoRecordFoundException("No user found for user id:- "+ userId);
+        GroupMemberEntity groupMember = groupRepository.getGroupMember(groupId, user.getId());
+        if(null != groupMember)
+            throw new DuplicateObjectException("User "+ userId+" already a member of group "+ groupId);
+        groupMember = new GroupMemberEntity();
         groupMember.setUserId(user.getId());
         groupMember.setGroupId(groupId);
         if(null != userPermissionDTO.isAdmin())
@@ -107,10 +111,10 @@ public class GroupBLImpl implements GroupBL {
     }
 
     @Override
-    public void changeMemberPermission(String groupId, String userUUId, UserPermissionDTO userPermissionDTO) {
-        UserEntity user = userRepository.findUserByUUId(userUUId);
+    public void changeMemberPermission(String groupId, String userId, UserPermissionDTO userPermissionDTO) {
+        UserEntity user = userRepository.getUserById(userId);
         if(null == user)
-            throw new NoRecordFoundException("No user found for user UUID:- "+ userUUId);
+            throw new NoRecordFoundException("No user found for user id:- "+ userId);
         GroupMemberEntity groupMember = groupRepository.getGroupMember(groupId, user.getId());
         if(null == groupMember)
             throw new NoRecordFoundException("No member found for group id:- "+ groupId+ " and user id:- "+ user.getId());
@@ -132,6 +136,11 @@ public class GroupBLImpl implements GroupBL {
         if(null == groupMember)
             throw new NoRecordFoundException("No member found for group id:- "+ groupId+ " and user id:- "+ user.getId());
         groupRepository.remove(groupMember);
+    }
+
+    @Override
+    public List<GroupMemberEntity> getGroupMember(String groupId) {
+        return groupRepository.getGroupMemberDetail(groupId);
     }
 
     private String uploadFile(List<FileDTO> files) {

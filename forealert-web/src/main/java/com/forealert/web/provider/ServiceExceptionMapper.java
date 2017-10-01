@@ -1,5 +1,6 @@
 package com.forealert.web.provider;
 
+import com.forealert.intf.dto.ForeAlertStatus;
 import com.forealert.intf.exception.ForeAlertException;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
@@ -7,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotAllowedException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
@@ -36,9 +39,15 @@ public class ServiceExceptionMapper implements javax.ws.rs.ext.ExceptionMapper<T
         }else if(throwable instanceof ForbiddenException || throwable instanceof SecurityException){
              code = HttpStatus.FORBIDDEN.value();
             message = "Your current role does not allow to access";
+        }else if(throwable instanceof NotAllowedException){
+            code = HttpStatus.METHOD_NOT_ALLOWED.value();
+            message = HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase();
         }else{
             throwable.printStackTrace();
         }
-        return Response.status(code).entity(message).build();
+        ForeAlertStatus status = new ForeAlertStatus();
+        status.setCode(code);
+        status.setMessage(message);
+        return Response.status(code).entity(status).build();
     }
 }

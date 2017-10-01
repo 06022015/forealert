@@ -22,13 +22,24 @@
             org.glassfish.jersey.servlet.ServletContainer
         </servlet-class>
         <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>com.forealert.web.provider.FAMetricRegistry</param-value>
+        </init-param>
+        <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>com.forealert.web</param-value>
         </init-param>
+
         <init-param>
             <param-name>jersey.config.server.provider.classnames</param-name>
-            <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature</param-value>
+            <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature;org.glassfish.jersey.filter.LoggingFilter</param-value>
         </init-param>
+        <!-- Enable Tracing support. -->
+        <init-param>
+            <param-name>jersey.config.server.tracing</param-name>
+            <param-value>ALL</param-value>
+        </init-param>
+
         <!-- <init-param>
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
             <param-value>true</param-value>

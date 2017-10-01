@@ -1,7 +1,6 @@
 package com.forealert.intf.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import com.couchbase.client.java.repository.annotation.Id;
 import com.forealert.intf.entity.type.AppEnum;
 import com.forealert.intf.entity.type.DeviceType;
 import com.forealert.intf.entity.type.PrivilegeType;
@@ -226,5 +225,28 @@ public class UserEntity extends Base{
             }
         }
         return hasRole;
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "uuId='" + uuId + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", profileURL='" + profileURL + '\'' +
+                ", role=" + role +
+                ", device=" + device +
+                ", app=" + app +
+                ", location=" + location +
+                ", toPurge=" + toPurge +
+                ", active=" + active +
+                ", googleUserId='" + googleUserId + '\'' +
+                ", token='" + token + '\'' +
+                ", loggedOut=" + loggedOut +
+                ", trackingOff=" + trackingOff +
+                ", privileges=" + privileges +
+                '}';
     }
 }

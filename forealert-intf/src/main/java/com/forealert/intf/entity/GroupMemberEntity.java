@@ -1,6 +1,7 @@
 package com.forealert.intf.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.forealert.intf.entity.type.PrivilegeType;
 import org.springframework.data.couchbase.core.mapping.Document;
 
@@ -30,10 +31,13 @@ public class GroupMemberEntity extends Base{
     @Field
     private boolean admin;
 
+    private UserEntity user;
+
     public GroupMemberEntity() {
         setTypeKey(TYPE);
     }
 
+    @JsonIgnore
     public String getGroupId() {
         return groupId;
     }
@@ -42,6 +46,7 @@ public class GroupMemberEntity extends Base{
         this.groupId = groupId;
     }
 
+    @JsonIgnore
     public String getUserId() {
         return userId;
     }
@@ -78,6 +83,14 @@ public class GroupMemberEntity extends Base{
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     @Override

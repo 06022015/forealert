@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="HOME_DIR" value="${catalina.home}" />
+    <property name="HOME_DIR" value="${catalina.base}" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -13,7 +13,7 @@
 
     <appender name="FILE-AUDIT"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${HOME_DIR}/logs/forealert.log</file>
+        <file>${HOME_DIR}/logs/forealert_debug.log</file>
         <!--<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{yyyy-MM-dd HH:mm:ss} - %msg%n
@@ -30,7 +30,7 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${HOME_DIR}/logs/forealert.%d{yyyy-MM-dd}.%i.log
+            <fileNamePattern>${HOME_DIR}/logs/forealert_error.%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -42,7 +42,7 @@
 
     <appender name="FILE-ERROR"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${HOME_DIR}/logs/forealert_error.log</file>
+        <file>${HOME_DIR}/logs/forealert.log</file>
         <!--<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{yyyy-MM-dd HH:mm:ss} - %msg%n
@@ -57,7 +57,7 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${HOME_DIR}/logs/forealert_error.%d{yyyy-MM-dd}.%i.log
+            <fileNamePattern>${HOME_DIR}/logs/ssp_error.%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">

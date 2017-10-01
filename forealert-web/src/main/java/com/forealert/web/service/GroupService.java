@@ -7,6 +7,7 @@ import com.forealert.intf.dto.UserPermissionDTO;
 import com.forealert.intf.entity.EmojiEntity;
 import com.forealert.intf.entity.GroupAttachmentEntity;
 import com.forealert.intf.entity.GroupEntity;
+import com.forealert.intf.entity.GroupMemberEntity;
 import com.forealert.intf.util.StringUtil;
 import com.forealert.web.security.FAPrincipal;
 import com.forealert.web.security.FASecured;
@@ -38,6 +39,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Path("/v1/group")
+@Produces({MediaType.APPLICATION_JSON})
 public class GroupService {
 
     private Logger logger = LoggerFactory.getLogger(GroupService.class);
@@ -49,7 +51,9 @@ public class GroupService {
     private GroupBL groupBL;
 
     @GET
+    @FASecured
     public Response getUserGroup(){
+        String userId = ((FAPrincipal)securityContext.getUserPrincipal()).getUserId();
         return Response.ok().entity(new GroupEntity()).build();
     }
 
@@ -57,7 +61,8 @@ public class GroupService {
     @Path("/{groupId}")
     public Response getGroup(@PathParam("groupId")String groupId){
         GroupEntity group = groupBL.getGroupById(groupId);
-         return Response.ok().entity(group).build();
+        group.setMember(groupBL.getGroupMember(groupId));
+        return Response.ok().entity(group).build();
     }
 
     @DELETE
@@ -67,17 +72,17 @@ public class GroupService {
     }
 
     @POST
-    @FASecured
+    //@FASecured
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createGroup(GroupEntity group){
         ForeAlertStatus status = new ForeAlertStatus();
         ValidatorUtil.validate(group, status);
         if(status.hasError()){
             return Response.status(HttpStatus.BAD_REQUEST.value()).entity(status).build();
-        }
-        String userId = ((FAPrincipal)securityContext.getUserPrincipal()).getUserId();
+        }                                   //TODO: Once security enable user should get from security context.
+        String userId = group.getCreatedBy();//((FAPrincipal)securityContext.getUserPrincipal()).getUserId();
         groupBL.save(userId, group);
-        return  Response.status(HttpStatus.OK.value()).entity(group).build();
+        return  Response.ok().entity(group).build();
     }
 
     @GET
@@ -131,33 +136,34 @@ public class GroupService {
     @GET
     @Path("/{groupId}/members")
     public Response getGroupMembers(@PathParam("groupId")String groupId){
-        return Response.ok().entity("").build();
+        List<GroupMemberEntity> groupMembers = groupBL.getGroupMember(groupId);
+        return Response.ok().entity(groupMembers).build();
     }
 
     @POST
-    @Path("/{groupId}/member/{userUUId}")
-    public Response addGroupMembers(@PathParam("groupId")String groupId, @PathParam("userUUId")String userUUId,
+    @Path("/{groupId}/member/{userId}")
+    public Response addGroupMembers(@PathParam("groupId")String groupId, @PathParam("userId")String userId,
                                     UserPermissionDTO userPermissionDTO){
         ForeAlertStatus status = new ForeAlertStatus();
         ValidatorUtil.validate(userPermissionDTO, status);
         if(status.hasError()){
             return Response.status(HttpStatus.BAD_REQUEST.value()).entity(status).build();
         }
-        groupBL.changeMemberPermission(groupId, userUUId, userPermissionDTO);
+        groupBL.addGroupMember(groupId, userId, userPermissionDTO);
         return Response.accepted().build();
     }
 
 
     @PUT
-    @Path("/{groupId}/member/{userUUId}")
-    public Response changeUserPermission(@PathParam("groupId")String groupId, @PathParam("userUUId")String userUUId,
+    @Path("/{groupId}/member/{userId}")
+    public Response changeUserPermission(@PathParam("groupId")String groupId, @PathParam("userId")String userId,
                                     UserPermissionDTO userPermissionDTO){
         ForeAlertStatus status = new ForeAlertStatus();
         ValidatorUtil.validate(userPermissionDTO, status);
         if(status.hasError()){
             return Response.status(HttpStatus.BAD_REQUEST.value()).entity(status).build();
         }
-        groupBL.changeMemberPermission(groupId, userUUId, userPermissionDTO);
+        groupBL.changeMemberPermission(groupId, userId, userPermissionDTO);
         return Response.accepted().build();
     }
 

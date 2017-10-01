@@ -5,6 +5,7 @@ import com.forealert.intf.dto.UserPermissionDTO;
 import com.forealert.intf.entity.EmojiEntity;
 import com.forealert.intf.entity.GroupAttachmentEntity;
 import com.forealert.intf.entity.GroupEntity;
+import com.forealert.intf.entity.GroupMemberEntity;
 
 import java.util.List;
 
@@ -33,8 +34,10 @@ public interface GroupBL {
 
     void addGroupMember(String groupId, String userId, UserPermissionDTO userPermissionDTO);
 
-    void changeMemberPermission(String groupId, String userUUId, UserPermissionDTO userPermissionDTO);
+    void changeMemberPermission(String groupId, String userId, UserPermissionDTO userPermissionDTO);
     
     void removeGroupMember(String groupId, String userUUId);
+    
+    List<GroupMemberEntity>  getGroupMember(String groupId);
     
 }
